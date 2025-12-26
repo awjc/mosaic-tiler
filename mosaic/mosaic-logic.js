@@ -3,6 +3,8 @@ let currentImages = []; // Track what's currently displayed
 let intervalId = null;
 let currentInterval = 10000;
 let tileCount = 3;
+let fillType = 'fill';
+let isPaused = false;
 
 const fileInput = document.getElementById('fileInput');
 const container = document.getElementById('container');
@@ -12,6 +14,9 @@ const tileCountDisplay = document.getElementById('tileCount');
 const toggleBtn = document.getElementById('toggleControls');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
 const controls = document.getElementById('controls');
+const fillTypeSelect = document.getElementById('fillTypeSelect');
+const pausePlayBtn = document.getElementById('pausePlayBtn');
+const restoreBtn = document.getElementById('restoreBtn');
 
 fileInput.addEventListener('change', (e) => {
   const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
@@ -41,8 +46,11 @@ intervalInput.addEventListener('change', (e) => {
 });
 
 toggleBtn.addEventListener('click', () => {
-  controls.classList.toggle('hidden');
-  toggleBtn.textContent = controls.classList.contains('hidden') ? 'Show Controls' : 'Hide Controls';
+  controls.classList.add('minimized');
+});
+
+restoreBtn.addEventListener('click', () => {
+  controls.classList.remove('minimized');
 });
 
 fullscreenBtn.addEventListener('click', () => {
@@ -50,6 +58,36 @@ fullscreenBtn.addEventListener('click', () => {
     document.documentElement.requestFullscreen();
   } else {
     document.exitFullscreen();
+  }
+});
+
+fillTypeSelect.addEventListener('change', (e) => {
+  fillType = e.target.value;
+
+  // Apply to all existing tiles
+  const tiles = document.querySelectorAll('.tile');
+  tiles.forEach(tile => {
+    tile.classList.remove('fill', 'fit');
+    tile.classList.add(fillType);
+  });
+});
+
+pausePlayBtn.addEventListener('click', () => {
+  if (isPaused) {
+    // Resume
+    isPaused = false;
+    pausePlayBtn.textContent = 'Pause';
+    if (images.length > 0) {
+      intervalId = setInterval(changeRandomTile, currentInterval);
+    }
+  } else {
+    // Pause
+    isPaused = true;
+    pausePlayBtn.textContent = 'Play';
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
   }
 });
 
@@ -62,7 +100,7 @@ function initTiles() {
   // Create tiles with initial unique images
   for (let i = 0; i < tileCount; i++) {
     const tile = document.createElement('div');
-    tile.className = 'tile';
+    tile.className = `tile ${fillType}`;
     tile.id = `tile${i}`;
     container.appendChild(tile);
 
@@ -71,8 +109,10 @@ function initTiles() {
     currentImages.push(imageUrl);
   }
 
-  // Start interval to change one random tile
-  intervalId = setInterval(changeRandomTile, currentInterval);
+  // Start interval to change one random tile (only if not paused)
+  if (!isPaused) {
+    intervalId = setInterval(changeRandomTile, currentInterval);
+  }
 }
 
 function getUniqueImage() {
@@ -114,6 +154,6 @@ function changeRandomTile() {
 // Press 'h' to toggle controls
 document.addEventListener('keydown', (e) => {
   if (e.key === 'h' || e.key === 'H') {
-    controls.classList.toggle('hidden');
+    controls.classList.toggle('minimized');
   }
 });

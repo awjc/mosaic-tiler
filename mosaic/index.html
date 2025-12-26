@@ -18,6 +18,24 @@ body {
   background: rgba(0,0,0,0.8);
   padding: 20px;
   border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.controls.minimized {
+  padding: 10px;
+  background: rgba(0,0,0,0.6);
+}
+.controls.minimized .controls-content {
+  display: none;
+}
+.controls.minimized #restoreBtn {
+  display: block;
+}
+#restoreBtn {
+  display: none;
+  padding: 8px 12px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 18px;
 }
 .controls input[type="file"] {
   margin-bottom: 10px;
@@ -31,6 +49,10 @@ body {
 }
 .controls input[type="number"] {
   width: 80px;
+  padding: 4px;
+}
+.controls select {
+  width: 100px;
   padding: 4px;
 }
 .controls button {
@@ -50,6 +72,15 @@ body {
   background-repeat: no-repeat;
   transition: opacity 0.5s ease-in-out;
 }
+.tile.fill {
+  background-size: cover;
+}
+.tile.fit {
+  background-size: contain;
+}
+.controls button {
+  margin-right: 5px;
+}
 .hidden {
   display: none;
 }
@@ -57,17 +88,28 @@ body {
 </head>
 <body>
 <div class="controls" id="controls">
-  <input type="file" id="fileInput" multiple accept="image/*" webkitdirectory directory>
-  <div>
-    <label>Tiles: <span id="tileCount">3</span></label>
-    <input type="range" id="tileSlider" min="1" max="6" value="3">
+  <button id="restoreBtn">☰</button>
+  <div class="controls-content">
+    <input type="file" id="fileInput" multiple accept="image/*" webkitdirectory directory>
+    <div>
+      <label>Tiles: <span id="tileCount">3</span></label>
+      <input type="range" id="tileSlider" min="1" max="6" value="3">
+    </div>
+    <div>
+      <label>Change every (seconds):</label>
+      <input type="number" id="intervalInput" min="1" value="10" step="1">
+    </div>
+    <div>
+      <label>Image fill type:</label>
+      <select id="fillTypeSelect">
+        <option value="fill">Fill</option>
+        <option value="fit">Fit</option>
+      </select>
+    </div>
+    <button id="pausePlayBtn">Pause</button>
+    <button id="toggleControls">Minimize</button>
+    <button id="fullscreenBtn">Fullscreen</button>
   </div>
-  <div>
-    <label>Change every (seconds):</label>
-    <input type="number" id="intervalInput" min="1" value="10" step="1">
-  </div>
-  <button id="toggleControls">Hide Controls</button>
-  <button id="fullscreenBtn">Fullscreen</button>
 </div>
 <div id="container"></div>
 
