@@ -5,6 +5,7 @@ let currentInterval = 10000;
 let tileCount = 3;
 let fillType = 'fill';
 let isPaused = false;
+let lastChangedTileIndex = -1;
 
 const fileInput = document.getElementById('fileInput');
 const container = document.getElementById('container');
@@ -39,8 +40,10 @@ intervalInput.addEventListener('change', (e) => {
   const value = parseInt(e.target.value);
   if (value > 0) {
     currentInterval = value * 1000;
-    if (images.length > 0) {
-      initTiles();
+    // Restart the interval with new timing (don't re-roll images)
+    if (!isPaused && intervalId) {
+      clearInterval(intervalId);
+      intervalId = setInterval(changeRandomTile, currentInterval);
     }
   }
 });
@@ -96,6 +99,7 @@ function initTiles() {
 
   container.innerHTML = '';
   currentImages = [];
+  lastChangedTileIndex = -1; // Reset last changed tile
 
   // Create tiles with initial unique images
   for (let i = 0; i < tileCount; i++) {
@@ -131,8 +135,22 @@ function getUniqueImage() {
 function changeRandomTile() {
   if (images.length === 0 || tileCount === 0) return;
 
-  // Pick a random tile
-  const tileIndex = Math.floor(Math.random() * tileCount);
+  // Pick a random tile (but not the same one as last time, if possible)
+  let tileIndex;
+  if (tileCount === 1) {
+    tileIndex = 0;
+  } else {
+    // Create array of available tile indices (excluding the last changed one)
+    const availableIndices = [];
+    for (let i = 0; i < tileCount; i++) {
+      if (i !== lastChangedTileIndex) {
+        availableIndices.push(i);
+      }
+    }
+    tileIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+  }
+
+  lastChangedTileIndex = tileIndex;
   const tile = document.getElementById(`tile${tileIndex}`);
 
   // Get new unique image

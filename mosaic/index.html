@@ -37,6 +37,9 @@ body {
   cursor: pointer;
   font-size: 18px;
 }
+#toggleControls {
+  margin-bottom: 15px;
+}
 .controls input[type="file"] {
   margin-bottom: 10px;
 }
@@ -90,6 +93,9 @@ body {
 <div class="controls" id="controls">
   <button id="restoreBtn">☰</button>
   <div class="controls-content">
+    <div>
+      <button id="toggleControls">Hide Controls</button>
+    </div>
     <input type="file" id="fileInput" multiple accept="image/*" webkitdirectory directory>
     <div>
       <label>Tiles: <span id="tileCount">3</span></label>
@@ -107,7 +113,6 @@ body {
       </select>
     </div>
     <button id="pausePlayBtn">Pause</button>
-    <button id="toggleControls">Minimize</button>
     <button id="fullscreenBtn">Fullscreen</button>
   </div>
 </div>
