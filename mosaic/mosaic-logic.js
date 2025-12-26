@@ -7,9 +7,8 @@ let tileCount = 3;
 const fileInput = document.getElementById('fileInput');
 const container = document.getElementById('container');
 const tileSlider = document.getElementById('tileSlider');
-const intervalSlider = document.getElementById('intervalSlider');
+const intervalInput = document.getElementById('intervalInput');
 const tileCountDisplay = document.getElementById('tileCount');
-const intervalValueDisplay = document.getElementById('intervalValue');
 const toggleBtn = document.getElementById('toggleControls');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
 const controls = document.getElementById('controls');
@@ -31,11 +30,13 @@ tileSlider.addEventListener('input', (e) => {
   }
 });
 
-intervalSlider.addEventListener('input', (e) => {
-  currentInterval = parseInt(e.target.value) * 1000;
-  intervalValueDisplay.textContent = e.target.value;
-  if (images.length > 0) {
-    initTiles();
+intervalInput.addEventListener('change', (e) => {
+  const value = parseInt(e.target.value);
+  if (value > 0) {
+    currentInterval = value * 1000;
+    if (images.length > 0) {
+      initTiles();
+    }
   }
 });
 
