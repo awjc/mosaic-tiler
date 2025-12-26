@@ -4,6 +4,7 @@ import * as Tone from "tone";
 export default function SteamyAudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [volume, setVolume] = useState(0.8);
   const loopRef = useRef<Tone.Sequence | null>(null);
   const transportStarted = useRef(false);
 
@@ -148,6 +149,14 @@ export default function SteamyAudioPlayer() {
     }
   };
 
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (masterRef.current) {
+      masterRef.current.gain.value = newVolume;
+    }
+  };
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -177,6 +186,21 @@ export default function SteamyAudioPlayer() {
       >
         {isPlaying ? "Pause" : "Play"} 💦
       </button>
+      <div style={{ marginTop: "2rem", maxWidth: "300px", margin: "2rem auto" }}>
+        <label htmlFor="volume-slider" style={{ display: "block", marginBottom: "0.5rem" }}>
+          Volume: {Math.round(volume * 100)}%
+        </label>
+        <input
+          id="volume-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={handleVolumeChange}
+          style={{ width: "100%" }}
+        />
+      </div>
       {isPlaying && (
         <p style={{ marginTop: "1rem", color: "#888" }}>
           Looping… enjoy the slurp
