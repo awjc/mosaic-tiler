@@ -98,9 +98,17 @@ function changeRandomTile() {
   // Get new unique image
   const newImage = getUniqueImage();
 
-  // Update tracking and display
-  currentImages[tileIndex] = newImage;
-  tile.style.backgroundImage = `url(${newImage})`;
+  // Fade out
+  tile.style.opacity = '0';
+
+  // Wait for fade out, then change image and fade in
+  setTimeout(() => {
+    currentImages[tileIndex] = newImage;
+    tile.style.backgroundImage = `url(${newImage})`;
+
+    // Fade in
+    tile.style.opacity = '1';
+  }, 500); // Match the CSS transition duration
 }
 
 // Press 'h' to toggle controls
