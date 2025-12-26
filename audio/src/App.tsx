@@ -65,9 +65,9 @@ export default function SteamyAudioPlayer() {
     // Drool drips
     dripRef.current = new Tone.MetalSynth({
       envelope: { attack: 0.001, decay: 0.3, release: 0.1 },
-      frequency: 800,
     }).connect(reverbRef.current);
     dripRef.current.volume.value = -18;
+    dripRef.current.frequency.value = 800;
 
     // Breathy moans
     moanRef.current = new Tone.FMSynth({
