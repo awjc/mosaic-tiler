@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Photo Tile Display</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #000;
+  color: #fff;
+}
+.controls {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  background: rgba(0,0,0,0.8);
+  padding: 20px;
+  border-radius: 8px;
+}
+.controls input[type="file"] {
+  margin-bottom: 10px;
+}
+.controls label {
+  display: block;
+  margin: 10px 0 5px;
+}
+.controls input[type="range"] {
+  width: 200px;
+}
+.controls button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+#container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+.tile {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: opacity 0.5s ease-in-out;
+}
+.hidden {
+  display: none;
+}
+</style>
+</head>
+<body>
+<div class="controls" id="controls">
+  <input type="file" id="fileInput" multiple accept="image/*" webkitdirectory directory>
+  <div>
+    <label>Tiles: <span id="tileCount">3</span></label>
+    <input type="range" id="tileSlider" min="1" max="6" value="3">
+  </div>
+  <div>
+    <label>Change every: <span id="intervalValue">10</span> seconds</label>
+    <input type="range" id="intervalSlider" min="5" max="60" value="10" step="5">
+  </div>
+  <button id="toggleControls">Hide Controls</button>
+  <button id="fullscreenBtn">Fullscreen</button>
+</div>
+<div id="container"></div>
+
+<script>
+let images = [];
+let currentImages = []; // Track what's currently displayed
+let intervalId = null;
+let currentInterval = 10000;
+let tileCount = 3;
+
+const fileInput = document.getElementById('fileInput');
+const container = document.getElementById('container');
+const tileSlider = document.getElementById('tileSlider');
+const intervalSlider = document.getElementById('intervalSlider');
+const tileCountDisplay = document.getElementById('tileCount');
+const intervalValueDisplay = document.getElementById('intervalValue');
+const toggleBtn = document.getElementById('toggleControls');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const controls = document.getElementById('controls');
+
+fileInput.addEventListener('change', (e) => {
+  const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+  images = files.map(f => URL.createObjectURL(f));
+
+  if (images.length > 0) {
+    initTiles();
+  }
+});
+
+tileSlider.addEventListener('input', (e) => {
+  tileCount = parseInt(e.target.value);
+  tileCountDisplay.textContent = tileCount;
+  if (images.length > 0) {
+    initTiles();
+  }
+});
+
+intervalSlider.addEventListener('input', (e) => {
+  currentInterval = parseInt(e.target.value) * 1000;
+  intervalValueDisplay.textContent = e.target.value;
+  if (images.length > 0) {
+    initTiles();
+  }
+});
+
+toggleBtn.addEventListener('click', () => {
+  controls.classList.toggle('hidden');
+  toggleBtn.textContent = controls.classList.contains('hidden') ? 'Show Controls' : 'Hide Controls';
+});
+
+fullscreenBtn.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+
+function initTiles() {
+  if (intervalId) clearInterval(intervalId);
+
+  container.innerHTML = '';
+  currentImages = [];
+
+  // Create tiles with initial unique images
+  for (let i = 0; i < tileCount; i++) {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.id = `tile${i}`;
+    container.appendChild(tile);
+
+    const imageUrl = getUniqueImage();
+    tile.style.backgroundImage = `url(${imageUrl})`;
+    currentImages.push(imageUrl);
+  }
+
+  // Start interval to change one random tile
+  intervalId = setInterval(changeRandomTile, currentInterval);
+}
+
+function getUniqueImage() {
+  // Get images not currently displayed
+  const available = images.filter(img => !currentImages.includes(img));
+
+  // If we have available unique images, use one
+  if (available.length > 0) {
+    return available[Math.floor(Math.random() * available.length)];
+  }
+
+  // Otherwise fall back to any random image
+  return images[Math.floor(Math.random() * images.length)];
+}
+
+function changeRandomTile() {
+  if (images.length === 0 || tileCount === 0) return;
+
+  // Pick a random tile
+  const tileIndex = Math.floor(Math.random() * tileCount);
+  const tile = document.getElementById(`tile${tileIndex}`);
+
+  // Get new unique image
+  const newImage = getUniqueImage();
+
+  // Update tracking and display
+  currentImages[tileIndex] = newImage;
+  tile.style.backgroundImage = `url(${newImage})`;
+}
+
+// Press 'h' to toggle controls
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'h' || e.key === 'H') {
+    controls.classList.toggle('hidden');
+  }
+});
+</script>
+</body>
+</html>
